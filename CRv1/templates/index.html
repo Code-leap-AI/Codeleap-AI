@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Course Confidence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --text-color: #2b2d42;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            max-width: 100%;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 30px;
+        }
+        
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .app-header {
+            background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 15px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .app-header p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.02);
+            font-size: 16px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .result-card {
+            display: none;
+        }
+        
+        .confidence-meter {
+            height: 25px;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            margin: 15px 0 25px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .confidence-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #f44336 0%, #ffa726 40%, #4caf50 80%);
+            width: 0;
+            transition: width 1s ease-in-out;
+            border-radius: 20px;
+        }
+        
+        .confidence-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-weight: 600;
+            font-size: 14px;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+        }
+        
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .recommendation-box {
+            background-color: rgba(76, 201, 240, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0 15px;
+            color: var(--secondary-color);
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .badge-easy {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .badge-moderate {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .badge-challenging {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .badge-unit {
+            background-color: rgba(0, 0, 0, 0.08);
+            color: #555;
+        }
+        
+        /* Mobile app-like animations */
+        .animate-in {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .spinner-wrapper {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <h1>Course Confidence</h1>
+            <p>Find your confidence level for any course</p>
+        </div>
+        
+        <div class="container px-3">
+            <div class="card animate-in">
+                <div class="card-body">
+                    <form id="student-form">
+                        <div class="mb-3">
+                            <label for="student-name" class="form-label">
+                                <i class="bi bi-person"></i> Your Name
+                            </label>
+                            <input type="text" class="form-control" id="student-name" placeholder="Enter your name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="course-select" class="form-label">
+                                <i class="bi bi-book"></i> Select Course
+                            </label>
+                            <select class="form-select" id="course-select" required>
+                                <option value="" selected disabled>Choose a course</option>
+                                {% for course in courses %}
+                                <option value="{{ course }}">{{ course }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="teacher-select" class="form-label">
+                                <i class="bi bi-mortarboard"></i> Select Professor
+                            </label>
+                            <select class="form-select" id="teacher-select" required disabled>
+                                <option value="" selected disabled>First select a course</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-lightning-charge"></i> Calculate Confidence
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="loading">
+                <div class="spinner-wrapper">
+                    <div class="spinner"></div>
+                </div>
+                <p>Analyzing course complexity...</p>
+            </div>
+            
+            <div class="result-card card">
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h5 class="section-title mb-0">Your Confidence Score</h5>
+                        <div class="confidence-meter">
+                            <div class="confidence-bar" id="confidence-bar"></div>
+                            <div class="confidence-label" id="confidence-label">0%</div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="section-title">Course Information</h5>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Course</div>
+                        <div class="info-value" id="result-course"></div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Professor</div>
+                        <div class="info-value" id="result-teacher"></div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Complexity</div>
+                        <div class="info-value">
+                            <span id="result-complexity-badge" class="badge badge-moderate">Moderate</span>
+                            <span id="result-complexity"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Estimated Completion</div>
+                        <div class="info-value" id="result-completion"></div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Most Challenging Unit</div>
+                        <div class="info-value">
+                            <span id="difficult-unit-badge" class="badge badge-unit">Unit 3</span>
+                            <span id="difficult-unit"></span>
+                        </div>
+                    </div>
+                    
+                    <h5 class="section-title">Recommendations</h5>
+                    <div class="recommendation-box" id="recommendation">
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-outline-primary w-100" id="new-analysis">
+                            <i class="bi bi-arrow-repeat"></i> New Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store the teachers by course data
+        const teachersByCourse = JSON.parse('{{ teachers_by_course|safe }}');
+        
+        // Update teachers dropdown when course changes
+        document.getElementById('course-select').addEventListener('change', function() {
+            const courseId = this.value;
+            const teacherSelect = document.getElementById('teacher-select');
+            
+            // Clear previous options
+            teacherSelect.innerHTML = '<option value="" selected disabled>Select a professor</option>';
+            
+            if (courseId && teachersByCourse[courseId]) {
+                // Add options for teachers in this course
+                teachersByCourse[courseId].forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher;
+                    option.textContent = teacher;
+                    teacherSelect.appendChild(option);
+                });
+                
+                // Enable the select
+                teacherSelect.disabled = false;
+            } else {
+                // Disable if no course selected
+                teacherSelect.disabled = true;
+            }
+        });
+        
+        // Form submission
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('student-name').value;
+            const courseId = document.getElementById('course-select').value;
+            const teacherName = document.getElementById('teacher-select').value;
+            
+            // Show loading
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.result-card').style.display = 'none';
+            
+            // Send data to server
+            const formData = new FormData();
+            formData.append('student_name', studentName);
+            formData.append('course', courseId);
+            formData.append('teacher', teacherName);
+            
+            fetch('/get_confidence', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading
+                document.querySelector('.loading').style.display = 'none';
+                
+                if (data.success) {
+                    // Display results
+                    const insights = data.insights;
+                    const confidenceScore = insights.confidence_score || 50;
+                    
+                    // Update confidence meter
+                    const confidenceValue = parseFloat(confidenceScore).toFixed(1);
+                    document.getElementById('confidence-bar').style.width = confidenceValue + '%';
+                    document.getElementById('confidence-label').textContent = confidenceValue + '%';
+                    
+                    // Debug confidence score
+                    console.log("Raw confidence score:", insights.confidence_score);
+                    console.log("Parsed confidence:", confidenceValue);
+                    
+                    // Update course info
+                    document.getElementById('result-course').textContent = data.course;
+                    document.getElementById('result-teacher').textContent = data.teacher;
+                    
+                    // Get course-specific insights
+                    const courseInsight = insights.course_insights && insights.course_insights[data.course];
+                    if (courseInsight) {
+                        const complexity = courseInsight.complexity || 'Moderate';
+                        document.getElementById('result-complexity').textContent = complexity;
+                        
+                        // Update complexity badge
+                        const complexityBadge = document.getElementById('result-complexity-badge');
+                        complexityBadge.textContent = complexity;
+                        complexityBadge.className = 'badge';
+                        
+                        if (complexity.toLowerCase().includes('easy')) {
+                            complexityBadge.classList.add('badge-easy');
+                        } else if (complexity.toLowerCase().includes('moderate')) {
+                            complexityBadge.classList.add('badge-moderate');
+                        } else {
+                            complexityBadge.classList.add('badge-challenging');
+                        }
+                        
+                        document.getElementById('recommendation').textContent = courseInsight.recommendation || 'No specific recommendations available.';
+                        document.getElementById('result-completion').textContent = courseInsight.estimated_completion || 'Unknown';
+                    }
+                    
+                    // Update difficult unit
+                    const difficultUnit = insights.most_difficult_unit || 'Unknown';
+                    document.getElementById('difficult-unit').textContent = difficultUnit;
+                    document.getElementById('difficult-unit-badge').textContent = difficultUnit;
+                    
+                    // Show results with animation
+                    const resultCard = document.querySelector('.result-card');
+                    resultCard.style.display = 'block';
+                    resultCard.classList.add('animate-in');
+                    
+                    // Scroll to results
+                    resultCard.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    // Show error
+                    alert(data.message || 'An error occurred');
+                }
+            })
+            .catch(error => {
+                document.querySelector('.loading').style.display = 'none';
+                console.error('Error:', error);
+                alert('An error occurred while calculating confidence.');
+            });
+        });
+        
+        // New analysis button
+        document.getElementById('new-analysis').addEventListener('click', function() {
+            document.querySelector('.result-card').style.display = 'none';
+            document.getElementById('student-form').reset();
+            document.getElementById('teacher-select').disabled = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

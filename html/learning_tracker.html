@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Progress Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 100px auto;
+            text-align: center;
+        }
+        
+        .app-container {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        input {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .subjects-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .subject-card {
+            flex: 1;
+            min-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar-container {
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .topics-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .topic-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .topic-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .completed {
+            background-color: #e8f8e8;
+            color: #27ae60;
+        }
+        
+        .next-topic {
+            border-left: 4px solid #3498db;
+            font-weight: bold;
+        }
+        
+        .topic-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-icon {
+            margin-left: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .completed-icon {
+            background-color: #2ecc71;
+        }
+        
+        .content-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            display: none;
+        }
+        
+        .back-button {
+            background-color: #7f8c8d;
+            margin-right: 10px;
+        }
+        
+        .mark-completed-button {
+            background-color: #2ecc71;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .logout-button {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="login-container">
+        <h1>Learning Progress Tracker</h1>
+        <p>Enter your name to begin or continue your learning journey</p>
+        <input type="text" id="username-input" placeholder="Your Name">
+        <button id="login-button">Start Learning</button>
+    </div>
+    
+    <!-- Main App -->
+    <div class="app-container" id="app-container">
+        <div class="welcome-header">
+            <div>
+                <h1>Welcome, <span id="user-name">Learner</span>!</h1>
+                <p>Continue your learning journey from where you left off.</p>
+            </div>
+            <button class="logout-button" id="logout-button">Logout</button>
+        </div>
+        
+        <div class="subjects-container" id="subjects-container">
+            <!-- Subject cards will be generated here -->
+        </div>
+        
+        <div class="content-container" id="content-container">
+            <h2 id="content-title">Topic Title</h2>
+            <div id="content-body">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="button-container">
+                <button class="back-button" id="back-button">Back to Subjects</button>
+                <button class="mark-completed-button" id="mark-completed-button">Mark as Completed</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample course structure data
+        const coursesData = {
+            'Math': {
+                name: 'Mathematics',
+                chapters: [
+                    { id: '1.1', title: 'Numbers and Operations', content: 'This is placeholder content for Numbers and Operations. Here you would learn about basic arithmetic operations including addition, subtraction, multiplication, and division.' },
+                    { id: '1.2', title: 'Fractions and Decimals', content: 'This is placeholder content for Fractions and Decimals. This section covers converting between fractions and decimals, as well as operations with them.' },
+                    { id: '1.3', title: 'Algebra Basics', content: 'This is placeholder content for Algebra Basics. Learn about variables, expressions, and simple equations.' },
+                    { id: '2.1', title: 'Linear Equations', content: 'This is placeholder content for Linear Equations. This section covers solving equations of the form ax + b = c.' },
+                    { id: '2.2', title: 'Systems of Equations', content: 'This is placeholder content for Systems of Equations. Learn how to solve multiple equations with multiple variables.' },
+                    { id: '2.3', title: 'Quadratic Equations', content: 'This is placeholder content for Quadratic Equations. This section covers solving equations of the form ax² + bx + c = 0.' },
+                    { id: '2.4', title: 'Polynomials', content: 'This is placeholder content for Polynomials. Learn about polynomial functions and operations.' }
+                ]
+            },
+            'Science': {
+                name: 'Science',
+                chapters: [
+                    { id: '1.1', title: 'Scientific Method', content: 'This is placeholder content for the Scientific Method. Here you would learn about observation, hypothesis, experimentation, analysis, and conclusion.' },
+                    { id: '1.2', title: 'States of Matter', content: 'This is placeholder content for States of Matter. This section covers solids, liquids, gases, and plasma.' },
+                    { id: '1.3', title: 'Energy', content: 'This is placeholder content for Energy. Learn about different forms of energy and energy transformations.' },
+                    { id: '2.1', title: 'Cell Structure', content: 'This is placeholder content for Cell Structure. This section covers the parts of a cell and their functions.' },
+                    { id: '2.2', title: 'Genetics', content: 'This is placeholder content for Genetics. Learn about DNA, genes, and inheritance.' },
+                    { id: '2.3', title: 'Ecosystems', content: 'This is placeholder content for Ecosystems. This section covers the interactions between organisms and their environment.' }
+                ]
+            },
+            'History': {
+                name: 'History',
+                chapters: [
+                    { id: '1.1', title: 'Ancient Civilizations', content: 'This is placeholder content for Ancient Civilizations. Here you would learn about early human societies like Mesopotamia, Egypt, and the Indus Valley.' },
+                    { id: '1.2', title: 'Classical Antiquity', content: 'This is placeholder content for Classical Antiquity. This section covers ancient Greece and Rome.' },
+                    { id: '1.3', title: 'Middle Ages', content: 'This is placeholder content for the Middle Ages. Learn about feudalism, the Byzantine Empire, and the Islamic Golden Age.' },
+                    { id: '2.1', title: 'Renaissance', content: 'This is placeholder content for the Renaissance. This section covers the cultural and artistic rebirth in Europe.' },
+                    { id: '2.2', title: 'Age of Exploration', content: 'This is placeholder content for the Age of Exploration. Learn about European voyages and the Columbian Exchange.' },
+                    { id: '2.3', title: 'Industrial Revolution', content: 'This is placeholder content for the Industrial Revolution. This section covers technological advancements and societal changes.' },
+                    { id: '2.4', title: 'Modern Era', content: 'This is placeholder content for the Modern Era. Learn about World Wars, the Cold War, and globalization.' }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const usernameInput = document.getElementById('username-input');
+        const loginButton = document.getElementById('login-button');
+        const userNameDisplay = document.getElementById('user-name');
+        const subjectsContainer = document.getElementById('subjects-container');
+        const contentContainer = document.getElementById('content-container');
+        const contentTitle = document.getElementById('content-title');
+        const contentBody = document.getElementById('content-body');
+        const backButton = document.getElementById('back-button');
+        const markCompletedButton = document.getElementById('mark-completed-button');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Current user and state
+        let currentUser = null;
+        let currentSubject = null;
+        let currentTopic = null;
+
+        // Initialize the app
+        function init() {
+            // Check for saved user
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                loadUserData();
+                showApp();
+            }
+
+            // Event listeners
+            loginButton.addEventListener('click', handleLogin);
+            backButton.addEventListener('click', showSubjects);
+            markCompletedButton.addEventListener('click', markTopicCompleted);
+            logoutButton.addEventListener('click', handleLogout);
+        }
+
+        // Handle login
+        function handleLogin() {
+            const username = usernameInput.value.trim();
+            if (username) {
+                currentUser = { name: username };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                loadUserData();
+                showApp();
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            loginContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            usernameInput.value = '';
+        }
+
+        // Load user data
+        function loadUserData() {
+            userNameDisplay.textContent = currentUser.name;
+            
+            // Get progress data from localStorage or initialize it
+            if (!localStorage.getItem(`progress_${currentUser.name}`)) {
+                const initialProgress = {};
+                Object.keys(coursesData).forEach(subject => {
+                    initialProgress[subject] = {
+                        completedTopics: [],
+                        lastAccessedTopic: coursesData[subject].chapters[0].id
+                    };
+                });
+                localStorage.setItem(`progress_${currentUser.name}`, JSON.stringify(initialProgress));
+            }
+            
+            renderSubjects();
+        }
+
+        // Show the main app
+        function showApp() {
+            loginContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            contentContainer.style.display = 'none';
+            subjectsContainer.style.display = 'flex';
+        }
+
+        // Show subjects
+        function showSubjects() {
+            contentContainer.style.display = 'none';
+            subjectsContainer.style.display = 'flex';
+            currentSubject = null;
+            currentTopic = null;
+        }
+
+        // Render subjects
+        function renderSubjects() {
+            subjectsContainer.innerHTML = '';
+            const progressData = JSON.parse(localStorage.getItem(`progress_${currentUser.name}`));
+            
+            Object.keys(coursesData).forEach(subjectKey => {
+                const subject = coursesData[subjectKey];
+                const subjectProgress = progressData[subjectKey];
+                const totalTopics = subject.chapters.length;
+                const completedTopics = subjectProgress.completedTopics.length;
+                const progressPercentage = Math.round((completedTopics / totalTopics) * 100);
+                
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                
+                const nextTopicIndex = getNextTopicIndex(subjectKey, subjectProgress);
+                
+                subjectCard.innerHTML = `
+                    <div class="subject-header">
+                        <h2>${subject.name}</h2>
+                        <span>${completedTopics}/${totalTopics} completed</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${progressPercentage}%"></div>
+                    </div>
+                    <ul class="topics-list">
+                        ${subject.chapters.map((topic, index) => {
+                            const isCompleted = subjectProgress.completedTopics.includes(topic.id);
+                            const isNextTopic = index === nextTopicIndex;
+                            return `
+                                <li class="topic-item ${isCompleted ? 'completed' : ''} ${isNextTopic ? 'next-topic' : ''}" 
+                                    data-subject="${subjectKey}" 
+                                    data-topic="${topic.id}">
+                                    <span>${topic.id}: ${topic.title}</span>
+                                    <div class="topic-status">
+                                        ${isCompleted ? '<span class="status-icon completed-icon"></span>' : ''}
+                                        ${isNextTopic && !isCompleted ? '<span>Next ➔</span>' : ''}
+                                    </div>
+                                </li>
+                            `;
+                        }).join('')}
+                    </ul>
+                `;
+                
+                subjectsContainer.appendChild(subjectCard);
+            });
+            
+            // Add event listeners to topics
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const subject = item.getAttribute('data-subject');
+                    const topicId = item.getAttribute('data-topic');
+                    loadTopic(subject, topicId);
+                });
+            });
+        }
+
+        // Get the index of the next topic to study
+        function getNextTopicIndex(subjectKey, subjectProgress) {
+            const subject = coursesData[subjectKey];
+            
+            // If no topics completed, return the first one
+            if (subjectProgress.completedTopics.length === 0) {
+                return 0;
+            }
+            
+            // If all topics completed, return the last one
+            if (subjectProgress.completedTopics.length === subject.chapters.length) {
+                return subject.chapters.length - 1;
+            }
+            
+            // Find the first non-completed topic
+            for (let i = 0; i < subject.chapters.length; i++) {
+                if (!subjectProgress.completedTopics.includes(subject.chapters[i].id)) {
+                    return i;
+                }
+            }
+            
+            return 0;
+        }
+
+        // Load a specific topic
+        function loadTopic(subject, topicId) {
+            currentSubject = subject;
+            currentTopic = topicId;
+            
+            // Update last accessed topic
+            const progressData = JSON.parse(localStorage.getItem(`progress_${currentUser.name}`));
+            progressData[subject].lastAccessedTopic = topicId;
+            localStorage.setItem(`progress_${currentUser.name}`, JSON.stringify(progressData));
+            
+            // Find the topic
+            const topic = coursesData[subject].chapters.find(chapter => chapter.id === topicId);
+            
+            // Display content
+            contentTitle.textContent = `${subject}: ${topic.id} - ${topic.title}`;
+            contentBody.textContent = topic.content;
+            
+            // Show content container
+            subjectsContainer.style.display = 'none';
+            contentContainer.style.display = 'block';
+            
+            // Update button state
+            const isCompleted = progressData[subject].completedTopics.includes(topicId);
+            if (isCompleted) {
+                markCompletedButton.textContent = 'Already Completed';
+                markCompletedButton.disabled = true;
+            } else {
+                markCompletedButton.textContent = 'Mark as Completed';
+                markCompletedButton.disabled = false;
+            }
+        }
+
+        // Mark the current topic as completed
+        function markTopicCompleted() {
+            if (!currentSubject || !currentTopic) return;
+            
+            const progressData = JSON.parse(localStorage.getItem(`progress_${currentUser.name}`));
+            
+            // Add to completed topics if not already there
+            if (!progressData[currentSubject].completedTopics.includes(currentTopic)) {
+                progressData[currentSubject].completedTopics.push(currentTopic);
+                localStorage.setItem(`progress_${currentUser.name}`, JSON.stringify(progressData));
+                
+                // Update button state
+                markCompletedButton.textContent = 'Already Completed';
+                markCompletedButton.disabled = true;
+                
+                // Find the next topic in sequence
+                const currentIndex = coursesData[currentSubject].chapters.findIndex(chapter => chapter.id === currentTopic);
+                const nextIndex = currentIndex + 1;
+                
+                // If there's a next topic, offer to go to it
+                if (nextIndex < coursesData[currentSubject].chapters.length) {
+                    const nextTopic = coursesData[currentSubject].chapters[nextIndex];
+                    const goToNextTopic = confirm(`Great job completing ${currentTopic}! Would you like to go to the next topic: ${nextTopic.id} - ${nextTopic.title}?`);
+                    if (goToNextTopic) {
+                        loadTopic(currentSubject, nextTopic.id);
+                        return;
+                    }
+                }
+                
+                // Go back to subjects view
+                showSubjects();
+                renderSubjects();
+            }
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Flash Card Generator",
+  "version": "1.0",
+  "description": "Create flash cards from selected text using Gemini API",
+  "permissions": [
+    "storage", 
+    "activeTab", 
+    "contextMenus"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["db-service.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
